@@ -1,0 +1,12 @@
+services:
+
+ n8n:
+    image: n8nio/n8n
+    restart: always
+    container_name: n8n
+    ports:
+      - "5678:5678"
+    volumes:
+      - \\wsl.localhost\Ubuntu\home\cris\.n8n:/home/node/.n8n
+    env_file:
+      - .env
