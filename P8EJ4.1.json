@@ -1,0 +1,200 @@
+{
+  "name": "P6EJ4.3",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "508393db-589c-4778-adb4-670a771e3cf5",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "254ca780-92c8-48b4-b6d3-f70bac779184",
+      "name": "Webhook",
+      "webhookId": "508393db-589c-4778-adb4-670a771e3cf5"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "9592642b-1023-4c79-8a8b-78cb72e21520",
+              "leftValue": "={{ $json.body.title }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "f355a78a-8d30-4169-84d0-2906631a0bbb",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "errorMessage": "Se requiere un \"title\""
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        416,
+        96
+      ],
+      "id": "80324d3c-b79c-469a-97c4-2eb479917b17",
+      "name": "Stop and Error"
+    },
+    {
+      "parameters": {
+        "queue": "task_created",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rabbitmq",
+      "typeVersion": 1.1,
+      "position": [
+        624,
+        -96
+      ],
+      "id": "31c2b764-07bb-41aa-84e2-4e596103952d",
+      "name": "RabbitMQ",
+      "credentials": {
+        "rabbitmq": {
+          "id": "d6y6oN9CcvHSfcQd",
+          "name": "RabbitMQ (env)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $('Select rows from a table').item.json.toJsonString() }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        832,
+        -96
+      ],
+      "id": "5312297e-527b-4087-a509-8100d4d62c16",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "operation": "select",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "task",
+          "mode": "list",
+          "cachedResultName": "task"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        416,
+        -96
+      ],
+      "id": "c5603c19-75c4-48bc-94c5-51f742737b41",
+      "name": "Select rows from a table",
+      "credentials": {
+        "postgres": {
+          "id": "i9Ys5yPykstgxjcn",
+          "name": "Postgres (env)"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Select rows from a table",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Stop and Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RabbitMQ": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Select rows from a table": {
+      "main": [
+        [
+          {
+            "node": "RabbitMQ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "d444c6d6-e9a9-4460-bc32-789add838bbb",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "1a588d8bd3ae7c90c219ad3f392f9ef5b6387ccb822c61f74260e7115eefb86e"
+  },
+  "id": "BFYAIXdJBljhG2oy",
+  "tags": []
+}
